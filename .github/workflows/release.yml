@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  # TestFlight drops a build 90 days after upload. GitHub cron has no "every 80
+  # days", so this runs daily and the job below bails out unless the last
+  # release is at least 80 days old.
+  schedule:
+    - cron: "0 5 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check whether a release is due
+        id: due
+        run: |
+          set -euo pipefail
+          last=$(gh release view --json publishedAt --jq .publishedAt 2>/dev/null || true)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ -z "$last" ]; then
+            echo "due=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          age=$(( ( $(date -u +%s) - $(date -u -d "$last" +%s) ) / 86400 ))
+          echo "Last release was $age day(s) ago ($last)."
+          [ "$age" -ge 80 ] && echo "due=true" >> "$GITHUB_OUTPUT" || echo "due=false" >> "$GITHUB_OUTPUT"
+
+      # The build number lives in project.yml, since the Xcode project is
+      # generated from it; the app and its extension share it.
+      - name: Bump build number
+        id: bump
+        if: steps.due.outputs.due == 'true'
+        run: |
+          set -euo pipefail
+          build=$(sed -n -E 's/^ *CURRENT_PROJECT_VERSION: *([0-9]+).*/\1/p' project.yml)
+          build=$((build + 1))
+          sed -i -E "s/^( *CURRENT_PROJECT_VERSION: *)[0-9]+/\1$build/" project.yml
+          version=$(sed -n -E 's/^ *MARKETING_VERSION: *"?([^"]+)"?.*/\1/p' project.yml)
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version-$build" >> "$GITHUB_OUTPUT"
+
+      # Xcode Cloud builds every new tag, but only when files changed, so the
+      # bump is committed and the tag goes on that commit.
+      - name: Commit and release
+        if: steps.due.outputs.due == 'true'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Bump build number to ${{ steps.bump.outputs.build }}" -- project.yml
+          git push
+          gh release create "${{ steps.bump.outputs.tag }}" \
+            --target "$(git rev-parse HEAD)" \
+            --title "${{ steps.bump.outputs.version }} (${{ steps.bump.outputs.build }})" \
+            --generate-notes

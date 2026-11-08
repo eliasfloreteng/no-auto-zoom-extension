@@ -29,3 +29,14 @@ To redraw the icons, run `swift scripts/generate-icons.swift`.
 ## Turning it on
 
 Settings › Apps › Safari › Extensions › No Auto Zoom: turn on **Allow Extension**, then set **All Websites** to **Allow**.
+
+## Releases
+
+Builds reach TestFlight through Xcode Cloud, whose workflow archives every new tag.
+`ci_scripts/ci_post_clone.sh` generates the Xcode project there, since it is not checked in.
+
+The **Release** GitHub Action bumps `CURRENT_PROJECT_VERSION` in `project.yml`, commits it and
+tags the commit `v<MARKETING_VERSION>-<build>`. Xcode Cloud only builds a tag whose files
+changed, so the bump is what starts the build. Run it from the Actions tab for a release; it
+also runs daily and releases on its own once the latest release is 80 days old, before the
+TestFlight build expires at 90.

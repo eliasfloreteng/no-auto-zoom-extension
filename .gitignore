@@ -2,3 +2,5 @@
 build/
 DerivedData/
 *.xcodeproj/
+.playwright-mcp/
+CLAUDE.local.md
