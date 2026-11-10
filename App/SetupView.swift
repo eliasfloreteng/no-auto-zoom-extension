@@ -58,6 +58,15 @@ struct SetupView: View {
                 }
             }
             .navigationTitle("No Auto Zoom")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    ShareLink(
+                        item: Self.website,
+                        message: Text("No Auto Zoom stops Safari on iPhone from zooming in when you tap a text field."),
+                        preview: SharePreview("No Auto Zoom", image: Image(.appIconArtwork))
+                    )
+                }
+            }
         }
         // Coming back from Settings is the moment the state is likely to have changed.
         .task(id: scenePhase) {
@@ -65,6 +74,7 @@ struct SetupView: View {
         }
     }
 
+    private static let website = URL(string: "https://noautozoom.eliasf.se")!
     private static let extensionIdentifier = "\(Bundle.main.bundleIdentifier!).extension"
 
     private func refreshState() async {
