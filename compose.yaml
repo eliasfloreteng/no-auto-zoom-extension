@@ -1,0 +1,23 @@
+# The website at https://noautozoom.eliasf.se. The pi checks this repo out as
+# the stack directory and redeploys it on every push to main.
+
+services:
+  web:
+    build:
+      context: ./web
+    restart: unless-stopped
+    # tini as PID 1, so the healthcheck's processes are reaped.
+    init: true
+    expose:
+      - 3000
+    networks:
+      - proxy
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.noautozoom.rule: Host(`noautozoom.eliasf.se`)
+      traefik.http.routers.noautozoom.entrypoints: websecure
+      traefik.http.services.noautozoom.loadbalancer.server.port: "3000"
+
+networks:
+  proxy:
+    external: true

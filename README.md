@@ -40,3 +40,8 @@ tags the commit `v<MARKETING_VERSION>-<build>`. Xcode Cloud only builds a tag wh
 changed, so the bump is what starts the build. Run it from the Actions tab for a release; it
 also runs daily and releases on its own once the latest release is 80 days old, before the
 TestFlight build expires at 90.
+
+## Website
+
+`web/` is the landing page at https://noautozoom.eliasf.se, a static site that Bun serves
+(`cd web && bun server.ts`). `compose.yaml` runs it on the pi, which redeploys on every push to `main`.

@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>No Auto Zoom: Safari stops zooming into text fields</title>
+<meta name="description" content="No Auto Zoom is a free Safari extension for iPhone that stops Safari from zooming in every time you tap a text field. Pinch-to-zoom keeps working.">
+<meta property="og:title" content="No Auto Zoom for Safari on iPhone">
+<meta property="og:description" content="Stop Safari zooming in every time you tap a text field. Pinch-to-zoom keeps working.">
+<meta property="og:image" content="https://noautozoom.eliasf.se/icon.png">
+<meta property="og:url" content="https://noautozoom.eliasf.se/">
+<meta name="theme-color" content="#f3f6fb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b111c" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/icon.png">
+<link rel="apple-touch-icon" href="/icon.png">
+<link rel="stylesheet" href="/style.css">
+<style>
+  .top { padding-block: 1.75rem; }
+
+  .hero {
+    display: grid; gap: 3rem 4rem; align-items: center;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+    padding-block: 2.5rem 5.5rem;
+  }
+  .hero h1 {
+    font-size: clamp(2.5rem, 5.6vw, 4.4rem);
+    font-weight: 800; line-height: 1; letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+  .hero .lede {
+    margin-top: 1.5rem; max-width: 29rem;
+    font-size: 1.1875rem; line-height: 1.5; color: var(--muted); text-wrap: pretty;
+  }
+  .hero .actions { margin-top: 2.25rem; display: grid; justify-items: start; gap: 0.9rem; }
+
+  /* Two iPhones tapping the same field: Safari on its own zooms, the other doesn't. */
+  .demo { margin: 0; display: flex; justify-content: center; gap: clamp(1rem, 4vw, 2.5rem); }
+  .demo figure { margin: 0; display: grid; gap: 0.9rem; justify-items: center; }
+  .demo figcaption { font-size: 0.9375rem; font-weight: 600; color: var(--muted); }
+  .demo .with figcaption { color: var(--accent); }
+
+  .phone {
+    container-type: inline-size;
+    width: min(15rem, 42vw); aspect-ratio: 9 / 19.5;
+    padding: 2.6%; border-radius: 15% / 7%;
+    background: #1b1f27;
+    box-shadow: 0 0 0 1px #3a4150 inset, 0 2.5rem 4rem -2rem color-mix(in srgb, var(--icon-bottom) 55%, transparent);
+  }
+  .screen {
+    position: relative; height: 100%; overflow: hidden;
+    border-radius: 12.5% / 5.8%;
+    background: #fff; color: #1c2230;
+    font-family: var(--sans);
+  }
+  .island {
+    position: absolute; z-index: 3; top: 3.2cqw; left: 50%; translate: -50% 0;
+    width: 30cqw; height: 8.5cqw; border-radius: 99px; background: #000;
+  }
+
+  .page { position: absolute; inset: 0; padding: 17cqw 7cqw 0; transform-origin: 4% 30%; }
+  .site-bar { display: flex; justify-content: space-between; align-items: center; }
+  .site-bar .logo { width: 22cqw; height: 5cqw; border-radius: 1.5cqw; background: #e4572e; }
+  .site-bar .menu { width: 6cqw; height: 4cqw; background: linear-gradient(#9aa3b2 0 0.7cqw, transparent 0.7cqw 1.65cqw, #9aa3b2 0 2.35cqw, transparent 0 3.3cqw, #9aa3b2 0); }
+  .page h3 { margin-top: 9cqw; font-size: 7.6cqw; font-weight: 750; letter-spacing: -0.03em; line-height: 1.1; }
+  .line { height: 2.6cqw; border-radius: 1cqw; background: #e4e8ee; margin-top: 2.4cqw; }
+  .label { display: block; margin-top: 5.5cqw; font-size: 3.4cqw; color: #687284; }
+  .field {
+    position: relative; display: flex; align-items: center; gap: 0.4cqw;
+    height: 10.5cqw; margin-top: 1.4cqw; padding-inline: 3cqw;
+    border: 0.45cqw solid #cbd2dc; border-radius: 2.4cqw;
+    font-size: 4cqw; color: #1c2230;
+  }
+  .field .caret { width: 0.55cqw; height: 5.2cqw; background: #2a5cdb; opacity: 0; }
+  .field.placeholder { color: #9aa3b2; }
+  .tap {
+    position: absolute; left: 38%; top: 50%; width: 13cqw; height: 13cqw; margin: -6.5cqw;
+    border-radius: 50%; background: rgba(20, 30, 50, 0.22); opacity: 0;
+  }
+  .search {
+    display: grid; place-items: center; height: 10.5cqw; margin-top: 5cqw;
+    border-radius: 2.4cqw; background: #e4572e; color: #fff; font-size: 4cqw; font-weight: 650;
+  }
+
+  .urlbar {
+    position: absolute; left: 5cqw; right: 5cqw; bottom: 5cqw; height: 11cqw;
+    display: grid; place-items: center; border-radius: 99px;
+    background: rgba(242, 243, 246, 0.94); box-shadow: 0 0.6cqw 3cqw rgba(0, 0, 0, 0.14);
+    font-size: 3.6cqw; color: #4b5466;
+  }
+
+  .keyboard {
+    position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; height: 41%;
+    padding: 3cqw 1.2cqw 0; display: grid; align-content: start; gap: 2.6cqw;
+    background: #d3d6dd; translate: 0 100%;
+  }
+  .keys { height: 10cqw; margin-inline: auto; }
+  .keys.r1 { width: 97cqw; background: repeating-linear-gradient(90deg, #fff 0 8.5cqw, transparent 8.5cqw 9.72cqw); }
+  .keys.r2 { width: 87cqw; background: repeating-linear-gradient(90deg, #fff 0 8.5cqw, transparent 8.5cqw 9.72cqw); }
+  .keys.r3 { width: 68cqw; background: repeating-linear-gradient(90deg, #fff 0 8.5cqw, transparent 8.5cqw 9.72cqw); }
+  .keys.r4 { width: 50cqw; background: #fff; border-radius: 1.4cqw; }
+
+  /* One loop: idle, tap, keyboard up (and on the left, the zoom), hold, back. */
+  @media (prefers-reduced-motion: no-preference) {
+    .tap { animation: tap 6s infinite; }
+    .keyboard { animation: keyboard 6s infinite; }
+    .field.target { animation: focus 6s infinite; }
+    .field.target .caret { animation: caret 6s infinite; }
+    .without .page { animation: zoom 6s infinite; }
+
+    @keyframes tap {
+      0%, 16% { opacity: 0; transform: scale(0.5); }
+      19% { opacity: 1; transform: scale(1); }
+      25%, 100% { opacity: 0; transform: scale(1.3); }
+    }
+    @keyframes keyboard {
+      0%, 21% { translate: 0 100%; }
+      30%, 80% { translate: 0 0; }
+      88%, 100% { translate: 0 100%; }
+    }
+    @keyframes zoom {
+      0%, 21% { transform: none; }
+      31%, 80% { transform: scale(1.75); }
+      89%, 100% { transform: none; }
+    }
+    @keyframes focus {
+      0%, 21%, 86%, 100% { border-color: #cbd2dc; }
+      24%, 82% { border-color: #2a5cdb; }
+    }
+    @keyframes caret {
+      0%, 23% { opacity: 0; }
+      24%, 36% { opacity: 1; }
+      37%, 44% { opacity: 0; }
+      45%, 57% { opacity: 1; }
+      58%, 65% { opacity: 0; }
+      66%, 80% { opacity: 1; }
+      81%, 100% { opacity: 0; }
+    }
+  }
+  /* Without motion, show the moment after the tap. */
+  @media (prefers-reduced-motion: reduce) {
+    .keyboard { translate: 0 0; }
+    .without .page { transform: scale(1.75); }
+    .field.target { border-color: #2a5cdb; }
+    .field.target .caret { opacity: 1; }
+  }
+
+  .features {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.5rem 3.5rem;
+    padding-block: 5rem; border-top: 1px solid var(--line);
+  }
+  .features h2 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+  .features p { margin-top: 0.6rem; color: var(--muted); max-width: var(--measure); text-wrap: pretty; }
+
+  .split {
+    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 1.25rem 4rem;
+    padding-block: 5rem; border-top: 1px solid var(--line);
+  }
+  .split h2 { font-size: clamp(1.75rem, 3.4vw, 2.4rem); font-weight: 780; letter-spacing: -0.035em; line-height: 1.05; text-wrap: balance; }
+  .split p { color: var(--muted); max-width: var(--measure); font-size: 1.125rem; text-wrap: pretty; }
+  .split p + p { margin-top: 1rem; }
+
+  .steps { list-style: none; padding: 0; display: grid; gap: 1.25rem; counter-reset: step; max-width: var(--measure); }
+  .steps li { display: grid; grid-template-columns: 2.25rem 1fr; gap: 1rem; align-items: start; font-size: 1.125rem; counter-increment: step; }
+  .steps li::before {
+    content: counter(step); display: grid; place-items: center; width: 2.25rem; height: 2.25rem;
+    border-radius: 50%; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 1rem;
+  }
+  .steps li span { padding-top: 0.2rem; }
+  .steps + .actions { margin-top: 2.25rem; }
+
+  @media (max-width: 60rem) {
+    .hero, .split { grid-template-columns: minmax(0, 1fr); }
+    .hero { padding-block: 1rem 4rem; }
+    .features { grid-template-columns: minmax(0, 1fr); gap: 2.25rem; padding-block: 3.5rem; }
+    .split { padding-block: 3.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/icon.png" alt="">No Auto Zoom</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <div>
+      <h1>Tap a text field. Safari stays put.</h1>
+      <p class="lede">No Auto Zoom is a Safari extension for iPhone. It stops the page from zooming in every time you tap a search box or a form, so you don't have to pinch back out. Pinch-to-zoom keeps working.</p>
+      <div class="actions">
+        <a class="button" href="https://testflight.apple.com/join/NCXvte5G">Install from TestFlight</a>
+        <p class="fine">Free, for iPhone with iOS 26.2 or later.</p>
+      </div>
+    </div>
+
+    <div class="demo" role="img" aria-label="Two iPhones tap the same text field. In Safari on its own the page zooms in and runs off the screen. With No Auto Zoom the page stays the same size.">
+      <figure class="without" aria-hidden="true">
+        <div class="phone"><div class="screen">
+          <div class="island"></div>
+          <div class="page">
+            <div class="site-bar"><span class="logo"></span><span class="menu"></span></div>
+            <h3>Book a train</h3>
+            <div class="line" style="width:90%"></div>
+            <div class="line" style="width:64%"></div>
+            <span class="label">From</span>
+            <div class="field target">Stockholm C<span class="caret"></span><span class="tap"></span></div>
+            <span class="label">To</span>
+            <div class="field placeholder">Where to?</div>
+            <div class="search">Search</div>
+          </div>
+          <div class="urlbar">trains.example</div>
+          <div class="keyboard"><div class="keys r1"></div><div class="keys r2"></div><div class="keys r3"></div><div class="keys r4"></div></div>
+        </div></div>
+        <figcaption>Safari</figcaption>
+      </figure>
+      <figure class="with" aria-hidden="true">
+        <div class="phone"><div class="screen">
+          <div class="island"></div>
+          <div class="page">
+            <div class="site-bar"><span class="logo"></span><span class="menu"></span></div>
+            <h3>Book a train</h3>
+            <div class="line" style="width:90%"></div>
+            <div class="line" style="width:64%"></div>
+            <span class="label">From</span>
+            <div class="field target">Stockholm C<span class="caret"></span><span class="tap"></span></div>
+            <span class="label">To</span>
+            <div class="field placeholder">Where to?</div>
+            <div class="search">Search</div>
+          </div>
+          <div class="urlbar">trains.example</div>
+          <div class="keyboard"><div class="keys r1"></div><div class="keys r2"></div><div class="keys r3"></div><div class="keys r4"></div></div>
+        </div></div>
+        <figcaption>With No Auto Zoom</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="features wrap" aria-label="What No Auto Zoom does">
+    <div>
+      <h2>Pinch-to-zoom still works</h2>
+      <p>Only the automatic zoom goes. You can still pinch to zoom in on any page, as far as you like.</p>
+    </div>
+    <div>
+      <h2>Every site, or all but a few</h2>
+      <p>It works on every website. To keep the zoom on one site, turn it off there from the extensions menu in Safari.</p>
+    </div>
+    <div>
+      <h2>Nothing leaves your iPhone</h2>
+      <p>No accounts, no analytics and no network requests. The list of sites you've turned it off for stays in Safari on your phone.</p>
+    </div>
+  </section>
+
+  <section class="split wrap">
+    <h2>Why does Safari zoom in?</h2>
+    <div>
+      <p>Safari zooms into any text field whose text is smaller than 16 pixels, so you can read what you type. Lots of sites use smaller text in their forms, so the page jumps every time you tap a field, and you're left pinching back out to see the rest.</p>
+      <p>A site can switch this off for itself by capping how far its page zooms. Safari ignores that cap when you pinch, so it only stops the automatic zoom. No Auto Zoom adds the cap to every page you open.</p>
+    </div>
+  </section>
+
+  <section class="split wrap" id="setup">
+    <h2>Set up in a minute</h2>
+    <div>
+      <ol class="steps">
+        <li><span>Install No Auto Zoom from TestFlight and open it.</span></li>
+        <li><span>Tap <b>Open Safari Extension Settings</b> and turn on <b>Allow Extension</b>.</span></li>
+        <li><span>Set <b>All Websites</b> to <b>Allow</b>, so it works on every site.</span></li>
+      </ol>
+      <div class="actions">
+        <a class="button" href="https://testflight.apple.com/join/NCXvte5G">Install from TestFlight</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>No Auto Zoom, by Elias Floreteng</span>
+    <nav><a href="/privacy">Privacy</a><a href="https://testflight.apple.com/join/NCXvte5G">TestFlight</a></nav>
+  </div>
+</footer>
+
+</body>
+</html>
