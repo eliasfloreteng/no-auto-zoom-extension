@@ -45,3 +45,8 @@ TestFlight build expires at 90.
 
 `web/` is the landing page at https://noautozoom.eliasf.se, a static site that Bun serves
 (`cd web && bun server.ts`). `compose.yaml` runs it on the pi, which redeploys on every push to `main`.
+
+For search engines and AI agents the site has `robots.txt`, `sitemap.xml`, `llms.txt` (the page as
+plain text) and structured data in `index.html`. Keep the questions in `index.html`, its structured
+data and `llms.txt` saying the same thing. `web/og.html` is the source of the share image `site/og.png`.
+The 32-character `.txt` file in `site/` is the IndexNow key that lets the site tell Bing about changes.

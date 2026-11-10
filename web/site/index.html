@@ -3,12 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>No Auto Zoom: Safari stops zooming into text fields</title>
-<meta name="description" content="No Auto Zoom is a free Safari extension for iPhone that stops Safari from zooming in every time you tap a text field. Pinch-to-zoom keeps working.">
-<meta property="og:title" content="No Auto Zoom for Safari on iPhone">
-<meta property="og:description" content="Stop Safari zooming in every time you tap a text field. Pinch-to-zoom keeps working.">
-<meta property="og:image" content="https://noautozoom.eliasf.se/icon.png">
+<title>No Auto Zoom: stop Safari on iPhone zooming in on text fields</title>
+<meta name="description" content="No Auto Zoom is a free Safari extension for iPhone that disables the auto-zoom when you tap a text field, search box or form. Pinch-to-zoom keeps working.">
+<link rel="canonical" href="https://noautozoom.eliasf.se/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="No Auto Zoom">
+<meta property="og:title" content="No Auto Zoom: stop Safari on iPhone zooming in on text fields">
+<meta property="og:description" content="A free Safari extension for iPhone that disables the auto-zoom when you tap a text field. Pinch-to-zoom keeps working.">
+<meta property="og:image" content="https://noautozoom.eliasf.se/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Tap a text field. Safari stays put. No Auto Zoom, a Safari extension for iPhone.">
 <meta property="og:url" content="https://noautozoom.eliasf.se/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="alternate" type="text/markdown" href="/llms.txt" title="No Auto Zoom, as plain text">
 <meta name="theme-color" content="#f3f6fb" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b111c" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/icon.png">
@@ -159,6 +167,10 @@
   .split p { color: var(--muted); max-width: var(--measure); font-size: 1.125rem; text-wrap: pretty; }
   .split p + p { margin-top: 1rem; }
 
+  .faq { display: grid; gap: 1.75rem; max-width: var(--measure); }
+  .faq h3 { font-size: 1.125rem; font-weight: 700; letter-spacing: -0.01em; line-height: 1.3; }
+  .faq p { margin-top: 0.4rem; font-size: 1.0625rem; }
+
   .steps { list-style: none; padding: 0; display: grid; gap: 1.25rem; counter-reset: step; max-width: var(--measure); }
   .steps li { display: grid; grid-template-columns: 2.25rem 1fr; gap: 1rem; align-items: start; font-size: 1.125rem; counter-increment: step; }
   .steps li::before {
@@ -175,6 +187,94 @@
     .split { padding-block: 3.5rem; }
   }
 </style>
+<script type="application/ld+json">
+[
+ {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "No Auto Zoom",
+  "description": "A Safari extension for iPhone that stops Safari from zooming in when you tap a text field. Pinch-to-zoom keeps working.",
+  "url": "https://noautozoom.eliasf.se/",
+  "image": "https://noautozoom.eliasf.se/icon.png",
+  "applicationCategory": "BrowserApplication",
+  "applicationSubCategory": "Safari extension",
+  "operatingSystem": "iOS 26.2 or later",
+  "softwareVersion": "1.0",
+  "installUrl": "https://testflight.apple.com/join/NCXvte5G",
+  "offers": {
+   "@type": "Offer",
+   "price": "0",
+   "priceCurrency": "USD"
+  },
+  "author": {
+   "@type": "Person",
+   "name": "Elias Floreteng"
+  }
+ },
+ {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+   {
+    "@type": "Question",
+    "name": "How do I stop Safari on iPhone from zooming in when I tap a text field?",
+    "acceptedAnswer": {
+     "@type": "Answer",
+     "text": "Install No Auto Zoom, then turn it on under Settings › Apps › Safari › Extensions › No Auto Zoom and set All Websites to Allow. After that, Safari no longer zooms in when you tap a text field, a search box or a form."
+    }
+   },
+   {
+    "@type": "Question",
+    "name": "Is there a setting in iOS that turns off the auto-zoom?",
+    "acceptedAnswer": {
+     "@type": "Answer",
+     "text": "No. iOS has no switch for it, and Safari's Page Zoom setting doesn't turn it off. A website can turn it off for its own pages, and a Safari extension like No Auto Zoom can do the same on every site."
+    }
+   },
+   {
+    "@type": "Question",
+    "name": "Can I still pinch to zoom?",
+    "acceptedAnswer": {
+     "@type": "Answer",
+     "text": "Yes. Only the automatic zoom on tapping a field goes away. Pinch-to-zoom works as before on every page."
+    }
+   },
+   {
+    "@type": "Question",
+    "name": "Does it work in Chrome or other browsers on iPhone?",
+    "acceptedAnswer": {
+     "@type": "Answer",
+     "text": "No. Safari extensions only run in Safari."
+    }
+   },
+   {
+    "@type": "Question",
+    "name": "Does it work on iPad?",
+    "acceptedAnswer": {
+     "@type": "Answer",
+     "text": "Not yet. No Auto Zoom is for iPhone, with iOS 26.2 or later."
+    }
+   },
+   {
+    "@type": "Question",
+    "name": "Is it free?",
+    "acceptedAnswer": {
+     "@type": "Answer",
+     "text": "Yes. It's free and in beta, and you install it through Apple's TestFlight app."
+    }
+   },
+   {
+    "@type": "Question",
+    "name": "What can the extension see?",
+    "acceptedAnswer": {
+     "@type": "Answer",
+     "text": "Safari warns that it can read and change web pages, because it runs on every page. It only reads and changes the page's viewport tag, which controls how far the page may zoom. It collects nothing and makes no network requests."
+    }
+   }
+  ]
+ }
+]
+</script>
 </head>
 <body>
 
@@ -257,6 +357,40 @@
     <div>
       <p>Safari zooms into any text field whose text is smaller than 16 pixels, so you can read what you type. Lots of sites use smaller text in their forms, so the page jumps every time you tap a field, and you're left pinching back out to see the rest.</p>
       <p>A site can switch this off for itself by capping how far its page zooms. Safari ignores that cap when you pinch, so it only stops the automatic zoom. No Auto Zoom adds the cap to every page you open.</p>
+    </div>
+  </section>
+
+  <section class="split wrap" id="questions">
+    <h2>Questions</h2>
+    <div class="faq">
+        <div>
+          <h3>How do I stop Safari on iPhone from zooming in when I tap a text field?</h3>
+          <p>Install No Auto Zoom, then turn it on under Settings › Apps › Safari › Extensions › No Auto Zoom and set All Websites to Allow. After that, Safari no longer zooms in when you tap a text field, a search box or a form.</p>
+        </div>
+        <div>
+          <h3>Is there a setting in iOS that turns off the auto-zoom?</h3>
+          <p>No. iOS has no switch for it, and Safari's Page Zoom setting doesn't turn it off. A website can turn it off for its own pages, and a Safari extension like No Auto Zoom can do the same on every site.</p>
+        </div>
+        <div>
+          <h3>Can I still pinch to zoom?</h3>
+          <p>Yes. Only the automatic zoom on tapping a field goes away. Pinch-to-zoom works as before on every page.</p>
+        </div>
+        <div>
+          <h3>Does it work in Chrome or other browsers on iPhone?</h3>
+          <p>No. Safari extensions only run in Safari.</p>
+        </div>
+        <div>
+          <h3>Does it work on iPad?</h3>
+          <p>Not yet. No Auto Zoom is for iPhone, with iOS 26.2 or later.</p>
+        </div>
+        <div>
+          <h3>Is it free?</h3>
+          <p>Yes. It's free and in beta, and you install it through Apple's TestFlight app.</p>
+        </div>
+        <div>
+          <h3>What can the extension see?</h3>
+          <p>Safari warns that it can read and change web pages, because it runs on every page. It only reads and changes the page's viewport tag, which controls how far the page may zoom. It collects nothing and makes no network requests.</p>
+        </div>
     </div>
   </section>
 
