@@ -8,6 +8,7 @@
 - Price: free
 - Privacy: collects nothing and makes no network requests. https://noautozoom.eliasf.se/privacy
 - Made by: Elias Floreteng
+- Source code (MIT license): https://github.com/eliasfloreteng/no-auto-zoom-extension
 
 ## The problem it solves
 

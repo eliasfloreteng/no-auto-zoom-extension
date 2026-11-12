@@ -2,9 +2,11 @@ name: Release
 
 on:
   workflow_dispatch:
-  # TestFlight drops a build 90 days after upload. GitHub cron has no "every 80
-  # days", so this runs daily and the job below bails out unless the last
-  # release is at least 80 days old.
+  # TestFlight drops a build 90 days after upload, and GitHub turns off the
+  # schedule of a public repo that has had no activity for 60 days. Releasing
+  # every 50 days stays ahead of both, since the bump commit is activity.
+  # GitHub cron has no "every 50 days", so this runs daily and the job below
+  # bails out unless the last release is at least 50 days old.
   schedule:
     - cron: "0 5 * * *"
 
@@ -33,7 +35,7 @@ jobs:
           fi
           age=$(( ( $(date -u +%s) - $(date -u -d "$last" +%s) ) / 86400 ))
           echo "Last release was $age day(s) ago ($last)."
-          [ "$age" -ge 80 ] && echo "due=true" >> "$GITHUB_OUTPUT" || echo "due=false" >> "$GITHUB_OUTPUT"
+          [ "$age" -ge 50 ] && echo "due=true" >> "$GITHUB_OUTPUT" || echo "due=false" >> "$GITHUB_OUTPUT"
 
       # The build number lives in project.yml, since the Xcode project is
       # generated from it; the app and its extension share it.
